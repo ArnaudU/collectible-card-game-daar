@@ -2,16 +2,28 @@
 pragma solidity ^0.8;
 
 import "./Collection.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Main {
-  int private count;
-  mapping(int => Collection) private collections;
+  mapping(string => Collection) private collections;
 
-  constructor() {
-    count = 0;
+  function createCollection(string calldata name) external {
+    collections[name] = new Collection(name);
   }
 
-  function createCollection(string calldata name, int cardCount) external {
-    collections[count++] = new Collection(name, cardCount);
+  function _addCard(
+    string memory _setName,
+    string memory _cardName,
+    string memory _imgURL
+  ) public {
+    collections[_setName].addCard(_cardName, _imgURL);
+  }
+
+  function mintCardToUser(
+    string memory collectionName,
+    address recipient,
+    uint256 cardId
+  ) public {
+    collections[collectionName].mintCard(recipient, cardId);
   }
 }
