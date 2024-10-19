@@ -11,5 +11,9 @@
   },
   "devDependencies": {
     "concurrently": "^7.5.0"
+  },
+  "dependencies": {
+    "@types/react-router-dom": "^5.3.3",
+    "yarn": "^1.22.22"
   }
 }
