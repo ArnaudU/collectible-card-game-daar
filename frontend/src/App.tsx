@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import styles from './styles.module.css'
 import * as ethereum from '@/lib/ethereum'
 import * as main from '@/lib/main'
+import Navbar from './components/Navbar'
+import Home from './pages/Home'
 
 type Canceler = () => void
 const useAffect = (
@@ -39,11 +41,13 @@ const useWallet = () => {
   }, [details, contract])
 }
 
-export const App = () => {
+export const App: React.FC = () => {
   const wallet = useWallet()
+  console.log(wallet)
   return (
     <div className={styles.body}>
-      <h1>Welcome to Pokémon TCG</h1>
+      <Navbar></Navbar>
+      <Home></Home>
     </div>
   )
 }
