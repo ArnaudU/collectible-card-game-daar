@@ -31,9 +31,21 @@ contract Collection is ERC721, Ownable {
     emit NewCard(_name, _imgURL);
   }
 
+  function getCard() external view returns (Card[] memory) {
+    Card[] memory res = new Card[](ownerCardsCount[msg.sender]);
+    uint cpt = 0;
+    for (uint i = 0; i < cards.length; i++) {
+      if (cardToOwner[i] == msg.sender) {
+        res[cpt++] = cards[i];
+      }
+    }
+    return res;
+  }
+
   function mintCard(address _to, uint256 _cardNumber) external {
     require(msg.sender == admin);
     cardToOwner[_cardNumber] = _to;
+    // ownerCardsCount[msg.sender]--;
     ownerCardsCount[_to]++;
     _safeMint(_to, _cardNumber);
   }

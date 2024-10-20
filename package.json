@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@types/react-router-dom": "^5.3.3",
+    "ethers": "^6.13.4",
+    "web3": "^4.13.0",
     "yarn": "^1.22.22"
   }
 }
