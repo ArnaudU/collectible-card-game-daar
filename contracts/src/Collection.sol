@@ -11,62 +11,33 @@ contract Collection is ERC721, Ownable {
   }
 
   event NewCard(string name, string imgURL);
-
-  mapping(uint256 => address) public cardToOwner;
-  mapping(address => uint256) public ownerCardsCount;
+  event MintCard(address indexed to, uint256 indexed cardNumber);
 
   string public collectionName;
-  address public admin;
-
   Card[] public cards;
 
   constructor(string memory _name) ERC721(_name, "PKMN") Ownable(msg.sender) {
     collectionName = _name;
-    admin = msg.sender;
   }
 
-  function addCard(string memory _name, string memory _imgURL) external {
-    require(msg.sender == admin);
+  function addCard(
+    string memory _name,
+    string memory _imgURL
+  ) external onlyOwner {
     cards.push(Card(_name, _imgURL));
     emit NewCard(_name, _imgURL);
   }
 
-  function getCard() external view returns (Card[] memory) {
-    Card[] memory res = new Card[](ownerCardsCount[msg.sender]);
-    uint cpt = 0;
-    for (uint i = 0; i < cards.length; i++) {
-      if (cardToOwner[i] == msg.sender) {
-        res[cpt++] = cards[i];
-      }
-    }
-    return res;
-  }
-
-  function mintCard(address _to, uint256 _cardNumber) external {
-    require(msg.sender == admin);
-    cardToOwner[_cardNumber] = _to;
-    // ownerCardsCount[msg.sender]--;
-    ownerCardsCount[_to]++;
+  function mintCard(address _to, uint256 _cardNumber) external onlyOwner {
+    require(_cardNumber < cards.length, "Invalid card number");
     _safeMint(_to, _cardNumber);
+    emit MintCard(_to, _cardNumber);
   }
 
-  function transferCard(address _from, address _to, uint256 _tokenId) external {
-    require(_from == ownerOf(_tokenId));
-    cardToOwner[_tokenId] = _to;
-    ownerCardsCount[_from]--;
-    ownerCardsCount[_to]++;
-    safeTransferFrom(_from, _to, _tokenId);
-  }
-
-  function balanceOf(
-    address _owner
-  ) public view override returns (uint256 _balance) {
-    return ownerCardsCount[_owner];
-  }
-
-  function ownerOf(
+  function tokenURI(
     uint256 _tokenId
-  ) public view override returns (address _owner) {
-    return cardToOwner[_tokenId];
+  ) public view override returns (string memory) {
+    require(_tokenId < cards.length, "Nonexistent token");
+    return cards[_tokenId].imgURL;
   }
 }
