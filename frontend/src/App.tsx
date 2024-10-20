@@ -48,6 +48,7 @@ export const App: React.FC = () => {
     <div className={styles.body}>
       <Navbar></Navbar>
       <Home></Home>
+      <p>${wallet?.details.account}</p>
     </div>
   )
 }
