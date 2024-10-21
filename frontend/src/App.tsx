@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import styles from './styles.module.css'
 import * as ethereum from '@/lib/ethereum'
 import * as main from '@/lib/main'
+
 import Navbar from './components/Navbar'
-import Home from './pages/Home'
+import MyCollection from './components/MyCollection';
+import OpenBooster from './components/OpenBooster';
 
 type Canceler = () => void
 const useAffect = (
@@ -41,14 +44,21 @@ const useWallet = () => {
   }, [details, contract])
 }
 
+
 export const App: React.FC = () => {
   const wallet = useWallet()
-  console.log(wallet)
+  const ownerAddress = wallet?.details.account
+  const contractAddress = main.myShip()
   return (
     <div className={styles.body}>
-      <Navbar></Navbar>
-      <Home></Home>
       <p>${wallet?.details.account}</p>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/my-collection" element={ownerAddress ? <MyCollection contractAddress={contractAddress} ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/> {/* Route pour Ma Collection */}
+          <Route path="/booster" element={ownerAddress ? <OpenBooster ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
+        </Routes>
+      </Router>
     </div>
   )
 }
