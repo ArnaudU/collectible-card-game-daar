@@ -16,7 +16,6 @@ export const init = async (details: ethereum.Details) => {
     return null
   }
   const { address, abi } = contracts.Main
-  console.log(address)
   const contract = new ethers.Contract(address, abi, provider)
   const deployed = await contract.deployed()
   if (!deployed) return null
