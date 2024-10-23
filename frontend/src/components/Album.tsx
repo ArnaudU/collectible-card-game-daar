@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ethers } from 'ethers';
 
 import { CardProps } from './Card';
 
 
 const API_PORT = import.meta.env.API_PORT;
 
-const Album: React.FC<{ }> = () => {
+const Album: React.FC<{}> = () => {
   const [cards, setCards] = useState<CardProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
