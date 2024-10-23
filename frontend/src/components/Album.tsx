@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { CardProps } from './Card';
+import { CardProps, Card } from './Card';
 
 
-const API_PORT = import.meta.env.API_PORT;
+const API_PORT = import.meta.env.VITE_API_PORT;
 
 const Album: React.FC<{}> = () => {
   const [cards, setCards] = useState<CardProps[]>([]);
@@ -15,6 +15,7 @@ const Album: React.FC<{}> = () => {
     try {
       const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo`);
       const cards: CardProps[] = response.data;
+      console.log(cards);
       setCards(cards);
       setLoading(false);
     } catch (error) {
@@ -38,8 +39,11 @@ const Album: React.FC<{}> = () => {
       <h1>Album</h1>
       {cards.length > 0 ? (
         <ul>
-          {cards.map((card) => (
+          {/* {cards.map((card) => (
             <li key={card.id}>Carte ID: {card.id}</li>
+          ))} */}
+          {cards.map((card) => (
+            <li key={card.id}><Card card={card}/></li>
           ))}
         </ul>
       ) : (

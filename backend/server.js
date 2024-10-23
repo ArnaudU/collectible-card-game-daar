@@ -30,6 +30,11 @@ let db = new Database('pokemon.db', (err) => {
 
 app.use('/api/cards', injectDB(db), cardRouter);
 app.use('/api/collection', collectionsRouter);
+app.use('/api/cill', (req, res) => {
+    console.log('cards');
+    res.status(200).send({ message: 'Route /api/cill atteinte' });
+});
+
 
 app.listen(port, () => {
     console.log(`Serveur connecté au ${port}`);
