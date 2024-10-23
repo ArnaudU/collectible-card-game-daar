@@ -52,13 +52,13 @@ export const App: React.FC = () => {
   return (
     <div className={styles.body}>
       <p>${wallet?.details.account}</p>
-      <Router>
+      {/* <Router>
         <Navbar />
         <Routes>
-          <Route path="/my-collection" element={ownerAddress ? <MyCollection contractAddress={contractAddress} ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/> {/* Route pour Ma Collection */}
+          <Route path="/my-collection" element={ownerAddress ? <MyCollection contractAddress={contractAddress} ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
           <Route path="/booster" element={ownerAddress ? <OpenBooster ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
         </Routes>
-      </Router>
+      </Router> */}
     </div>
   )
 }
