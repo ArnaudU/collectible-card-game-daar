@@ -3,30 +3,6 @@ import * as main from "../contract.js";
 
 const collectionsRouter = express.Router();
 
-async function getAllCollections() {
-
-    const contract = await main.init()
-    // Now you can use the contract_ object for interactions.
-    const collection = await contract.getCollectionsAndCards(true, false, contract.owner())
-    return collection.map((collection) => {
-        return {
-            collectionId: collection[0].toNumber(),
-            collectionName: collection[1] === "BP" ? collection[1] + "-" + collection[0].toNumber() : collection[1],
-            cardCount: collection[2].toNumber(),
-            cards: collection[3].map((card) => {
-                return {
-                    img: card[0],
-                    cardNumber: card[1].toNumber(),
-                    cardGid: card[2].toNumber(),
-                    onSell: card[3],
-                    cardOwner: card[4]
-                };
-            }),
-            redeemed: collection[4],
-            owner: collection[5]
-        };
-    })
-}
 
 async function getUserCollections(user) {
 

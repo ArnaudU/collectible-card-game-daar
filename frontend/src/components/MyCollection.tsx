@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ethers } from 'ethers';
-import erc721Abi from '../abis/ERC721Enumerable.json';
+import contractInterface from '../abis/Main.json';
 import { CardProps } from './Card';
 
 
@@ -17,20 +17,17 @@ const MyCollection: React.FC<{ contractAddress: string; ownerAddress: string }> 
       // Initialiser le fournisseur et signer avec MetaMask
       const provider = new ethers.providers.Web3Provider((window as any).ethereum);
       const signer = provider.getSigner();
-
       // Instancier le contrat ERC721
-      const contract = new ethers.Contract(contractAddress, erc721Abi, signer);
-
+      const contract = new ethers.Contract(contractAddress, contractInterface, signer);
       // Récupérer le nombre de cartes détenues par le propriétaire
       const balance = await contract.balanceOf(ownerAddress);
       const cardPromises = [];
-
       // Boucle pour récupérer chaque token détenu par le propriétaire
       for (let i = 0; i < balance.toNumber(); i++) {
         // Récupérer l'ID du token détenu à un index spécifique
         const tokenId = await contract.tokenOfOwnerByIndex(ownerAddress, i);
         try {
-          const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/${tokenId}`);
+          const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/token=${tokenId}`);
           const card: CardProps = response.data; // Les données du backend
           cardPromises.push(card);
         }
