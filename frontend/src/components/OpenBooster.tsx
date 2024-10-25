@@ -3,12 +3,12 @@ import { CardProps } from './Card';
 import axios from 'axios'
 
 interface OpenBoosterProps {
-  ownerAddress: string;
+  userAddress: string;
 }
 
 const API_PORT = import.meta.env.API_PORT;
 
-const OpenBooster: React.FC<OpenBoosterProps> = ({ ownerAddress }) => {
+const OpenBooster: React.FC<{userAddress: string}> = ({ userAddress }) => {
   const [cards, setCards] = useState<CardProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +20,7 @@ const OpenBooster: React.FC<OpenBoosterProps> = ({ ownerAddress }) => {
     try {
       // Appel au backend pour obtenir les données du booster
       const response = await axios.get(`http://localhost:${API_PORT}/api/openBooster`, {
-        params: { owner: ownerAddress }, // Vous pouvez envoyer l'adresse du propriétaire au backend
+        params: { owner: userAddress }, // Vous pouvez envoyer l'adresse du propriétaire au backend
       });
       const boosterCards: CardProps[] = response.data; // Les données du backend
 
@@ -36,11 +36,11 @@ const OpenBooster: React.FC<OpenBoosterProps> = ({ ownerAddress }) => {
   // Utiliser useEffect pour charger les données lors du montage du composant
   useEffect(() => {
     fetchBoosterData();
-  }, [ownerAddress]); // Réexécuter si l'adresse du propriétaire change
+  }, [userAddress]); // Réexécuter si l'adresse du propriétaire change
 
   return (
     <div>
-      <h2>Ouvrir un booster pour {ownerAddress}</h2>
+      <h2>Ouvrir un booster pour {userAddress}</h2>
       {loading ? (<p>Chargement des cartes...</p>) : 
         error ? (<p>{error}</p>) : (
         <div>
@@ -49,9 +49,8 @@ const OpenBooster: React.FC<OpenBoosterProps> = ({ ownerAddress }) => {
               {cards.map((card) => (
                 <li key={card.id}>
                   <h3>{card.name}</h3>
-                  <img src={card.images.small} alt={card.name} />
+                  <img src={card.images} alt={card.name} />
                   <p>Types: {card.types.join(', ')}</p>
-                  <p>Set: {card.set.name} ({card.set.series})</p>
                   <p>Prix moyen: {card.averagePrices} ETH</p>
                 </li>
               ))}

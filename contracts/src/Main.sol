@@ -67,6 +67,17 @@ contract Main is Ownable {
               CardData(dataCard.cardName, dataCard.id, dataCard.imgURL)
             );
           }
+=======
+    function mintCardToUser(string memory _collectionName, address recipient, uint256 cardId) public onlyOwner {
+        
+        collections[_collectionName].mintCard(recipient, cardId);
+    }
+
+    function mintMultipleCardsToUser(string memory _collectionName, address _to, uint256[] memory cardIds) public onlyOwner {
+        require(address(collections[_collectionName]) != address(0), "Collection does not exist");
+        for (uint256 i = 0; i < cardIds.length; i++) {
+            collections[_collectionName].mintCard(_to, cardIds[i]);
+>>>>>>> Stashed changes
         }
       }
     }

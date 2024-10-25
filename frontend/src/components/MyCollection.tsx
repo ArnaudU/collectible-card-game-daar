@@ -7,7 +7,7 @@ import { CardProps } from './Card';
 
 const API_PORT = import.meta.env.API_PORT;
 
-const MyCollection: React.FC<{ contract: ethers.Contract; ownerAddress: string }> = ({ contract, ownerAddress }) => {
+const MyCollection: React.FC<{ contract: ethers.Contract; userAddress: string }> = ({ contract, userAddress }) => {
   const [cards, setCards] = useState<CardProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -15,12 +15,12 @@ const MyCollection: React.FC<{ contract: ethers.Contract; ownerAddress: string }
   const fetchOwnerCards = async () => {
     try {
       // Récupérer le nombre de cartes détenues par le propriétaire
-      const balance = await contract.balanceOf(ownerAddress);
+      const balance = await contract.balanceOf(userAddress);
       const cardPromises = [];
       // Boucle pour récupérer chaque token détenu par le propriétaire
       for (let i = 0; i < balance.toNumber(); i++) {
         // Récupérer l'ID du token détenu à un index spécifique
-        const tokenId = await contract.tokenOfOwnerByIndex(ownerAddress, i);
+        const tokenId = await contract.tokenOfOwnerByIndex(userAddress, i);
         try {
           const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/${tokenId}`);
           const card: CardProps = response.data;
@@ -43,10 +43,10 @@ const MyCollection: React.FC<{ contract: ethers.Contract; ownerAddress: string }
 
   // Charger les cartes à partir de la blockchain
   useEffect(() => {
-    if (ownerAddress) {
+    if (userAddress) {
       fetchOwnerCards();
     }
-  }, [ownerAddress]);
+  }, [userAddress]);
 
   // Affichage des cartes
   if (loading) {
