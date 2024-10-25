@@ -3,13 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styles from './styles.module.css'
 import * as ethereum from '@/lib/ethereum'
 import * as main from '@/lib/main'
-import { ethers } from 'ethers'
 
 import Navbar from './components/Navbar'
 import MyCollection from './components/MyCollection';
 import OpenBooster from './components/OpenBooster';
-
-import contractInterface from './abis/Main.json'
 import Album from './components/Album';
 
 type Canceler = () => void
@@ -50,26 +47,39 @@ const useWallet = () => {
 
 
 export const App: React.FC = () => {
-  const wallet = useWallet()
-  const ownerAddress = wallet?.details.account
-  const contractAddress = main.myShip()
+  const [userAddress, setUserAddress] = useState<string | null>(null);
 
-  // Initialiser le fournisseur et signer avec MetaMask
-  const provider = new ethers.providers.Web3Provider((window as any).ethereum);
-  const signer = provider.getSigner();
+  const wallet = useWallet()
+  const provider = wallet?.details.provider;
+  
   // Instancier le contrat ERC721
-  const contract = new ethers.Contract(contractAddress, contractInterface, signer);
+  const contract = wallet?.contract
+  const superAdminAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'.toLowerCase();
+  var isSuperAdmin = superAdminAddress === userAddress;
+
+  useEffect(() => {
+    if (wallet && wallet.details) {
+      // Si wallet.details.account est undefined, setUserAddress recevra null
+      setUserAddress(wallet.details.account?.toLowerCase() ?? null); 
+    }
+    ethereum.accountsChanged(accounts => {
+      setUserAddress(accounts[0].toLowerCase());
+    });
+  }, [provider]);
+
+  useEffect(() => {
+      isSuperAdmin = userAddress === superAdminAddress;
+  }, [userAddress]);
+
 
   return (
     <div className={styles.body}>
-      <p>${wallet?.details.account}</p>
       <Router>
         <Navbar />
         <Routes>
-          <Route path="/" element={<p>Home</p>} />
-          <Route path="/album" element={<Album />} />
-          <Route path="/my-collection" element={ownerAddress ? <MyCollection contract={contract} ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
-          <Route path="/booster" element={ownerAddress ? <OpenBooster ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
+          <Route path="/" element={<Album contract={contract} isSuperAdmin={isSuperAdmin} userAddress={userAddress}/>} />
+          {/* <Route path="/my-collection" element={userAddress ? <MyCollection contract={contract} userAddress={userAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/> */}
+          <Route path="/booster" element={userAddress ? <OpenBooster userAddress={userAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
         </Routes>
       </Router>
     </div>

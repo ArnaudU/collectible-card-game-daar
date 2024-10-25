@@ -50,6 +50,7 @@ contract Main is Ownable {
     }
   }
 
+<<<<<<< Updated upstream
   function listCards(address _owner) public view returns (CardData[] memory) {
     CardData[] memory data = new CardData[](count);
     uint256 index = 0;
@@ -67,6 +68,17 @@ contract Main is Ownable {
               CardData(cards[j].cardName, cards[j].id, cards[j].imgURL)
             );
           }
+=======
+    function mintCardToUser(string memory _collectionName, address recipient, uint256 cardId) public onlyOwner {
+        
+        collections[_collectionName].mintCard(recipient, cardId);
+    }
+
+    function mintMultipleCardsToUser(string memory _collectionName, address _to, uint256[] memory cardIds) public onlyOwner {
+        require(address(collections[_collectionName]) != address(0), "Collection does not exist");
+        for (uint256 i = 0; i < cardIds.length; i++) {
+            collections[_collectionName].mintCard(_to, cardIds[i]);
+>>>>>>> Stashed changes
         }
       }
     }
