@@ -5,91 +5,85 @@ import "./Collection.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Main is Ownable {
-  event CollectionCreated(string collectionName, address collectionAddress);
-
-  mapping(string => Collection) private collections;
-  string[] internal collectionNames;
-  int private count;
   struct CardData {
     string cardName;
     string id;
-    address owner;
-    string setName;
     string imgURL;
   }
 
+  event CollectionCreated(string collectionName, address collectionAddress);
+  mapping(string => Collection) private boosters;
+  Collection private opened;
+  string[] internal boosterNames;
+  uint private count;
+  uint256 public listingPrice = 1 ether;
+
   constructor() Ownable(msg.sender) {
-    count = 1;
+    count = 0;
   }
 
-  function createBooster(
-    string calldata _name,
-    bool _isBooster,
-    CardData[] calldata data
+  function createBoosters(
+    string memory _name,
+    CardData[] memory data
   ) external onlyOwner {
-    Collection newCollection = new Collection(_name, _isBooster);
-    collections[_name] = newCollection;
-    collectionNames.push(_name);
+    Collection newCollection = new Collection(_name);
+    boosters[_name] = newCollection;
+    boosterNames.push(_name);
     // Boucle sur les données de cartes
     for (uint i = 0; i < data.length; i++) {
       // Récupérer chaque élément de CardData
       CardData memory card = data[i];
-      collections[_name].addCard(card.cardName, card.setName, card.imgURL);
+      boosters[_name].addCard(card.cardName, card.id, card.imgURL);
+      count++;
     }
   }
 
-  function addCard(
-    string memory _cardName,
-    string memory _setName,
-    string memory _imgURL
-  ) public onlyOwner {
-    require(
-      address(collections[_setName]) != address(0),
-      "Collection does not exist"
-    );
-    collections[_setName].addCard(_cardName, _setName, _imgURL);
+  function openBooster(address _buyer) public {
+    for (uint256 i = 0; i < boosterNames.length; i++) {
+      string memory collectionName = boosterNames[i];
+      // Vérifie que la collection existe
+      Collection card = boosters[collectionName];
+      if (card.checkIfBooster()) {
+        card.openBooster(_buyer);
+        break;
+      }
+    }
   }
 
-  function mintCardToUser(
-    string memory _collectionName,
-    address recipient,
-    uint256 cardId
-  ) public onlyOwner {
-    require(
-      address(collections[_collectionName]) != address(0),
-      "Collection does not exist"
-    );
-    collections[_collectionName].mintCard(recipient, cardId);
+  function listCards(address _owner) public view returns (CardData[] memory) {
+    CardData[] memory data = new CardData[](count);
+    uint256 index = 0;
+    for (uint256 i = 0; i < boosterNames.length; i++) {
+      string memory collectionName = boosterNames[i];
+      // Vérifie que la collection existe
+      if (address(boosters[collectionName]) != address(0)) {
+        Collection.Card[] memory cards = boosters[collectionName].getCards();
+        for (uint256 j = 0; j < cards.length; j++) {
+          if (
+            (_owner == address(0) && !(_owner == cards[j].owner)) ||
+            (!(_owner == address(0)) && _owner == cards[j].owner)
+          ) {
+            data[index++] = (
+              CardData(cards[j].cardName, cards[j].id, cards[j].imgURL)
+            );
+          }
+        }
+      }
+    }
+    return data;
   }
 
-  function mintMultipleCardsToUser(
+  function mintCardsToUser(
     string memory _collectionName,
     address _to,
     uint256[] memory cardIds
   ) public onlyOwner {
     require(
-      address(collections[_collectionName]) != address(0),
+      address(boosters[_collectionName]) != address(0),
       "Collection does not exist"
     );
     for (uint256 i = 0; i < cardIds.length; i++) {
-      collections[_collectionName].mintCard(_to, cardIds[i]);
+      boosters[_collectionName].mintCard(_to, cardIds[i]);
     }
-  }
-
-  // Fonction pour obtenir le nombre total de cartes possédées par une adresse dans toutes les collections
-  function balanceOf(address ownerAddress) public view returns (uint256) {
-    uint256 totalBalance = 0;
-
-    // Boucle sur chaque collection dans le tableau collectionNames
-    for (uint256 i = 0; i < collectionNames.length; i++) {
-      string memory collectionName = collectionNames[i];
-
-      // Vérifie que la collection existe
-      if (address(collections[collectionName]) != address(0)) {
-        // Ajoute le balanceOf de cette collection au total
-        totalBalance += collections[collectionName].balanceOf(ownerAddress);
-      }
-    }
-    return totalBalance;
   }
 }

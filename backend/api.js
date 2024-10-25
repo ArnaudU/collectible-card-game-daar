@@ -1,7 +1,5 @@
 import fetch from 'node-fetch';
-const apiUrl = 'https://api.pokemontcg.io/v2/cards';
-import * as main from "../contract.js";
-import { arr } from "../server.js";
+export const apiUrl = 'https://api.pokemontcg.io/v2/cards';
 
 export async function extractData() {
     try {
@@ -36,31 +34,3 @@ export async function extractData() {
         return null
     }
 }
-
-
-export async function addBoosterToCollection() {
-    const contract = await main.init();
-    let boosteNumber = 0;
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    while (arr.length >= 5) {
-        console.log(arr.length)
-        let boosterName = "Booster" + boosteNumber
-        boosteNumber++;
-        let cards = []
-        for (let i = 0; i < 5; i++) {
-            const card = arr.pop();
-            cards.push({
-                cardName: card.name,
-                setName: card.set.name,
-                imgURL: card.images
-            })
-        }
-        contract.createBooster(boosterName, true, cards);
-    }
-}
-
-await addBoosterToCollection();
-console.log("Booster ajouté dans la blockchain");

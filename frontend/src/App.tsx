@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styles from './styles.module.css'
 import * as ethereum from '@/lib/ethereum'
 import * as main from '@/lib/main'
+import { ethers } from 'ethers'
 
 import Navbar from './components/Navbar'
 import MyCollection from './components/MyCollection';
 import OpenBooster from './components/OpenBooster';
+
+import contractInterface from './abis/Main.json'
+import Album from './components/Album';
 
 type Canceler = () => void
 const useAffect = (
@@ -49,13 +53,22 @@ export const App: React.FC = () => {
   const wallet = useWallet()
   const ownerAddress = wallet?.details.account
   const contractAddress = main.myShip()
+
+  // Initialiser le fournisseur et signer avec MetaMask
+  const provider = new ethers.providers.Web3Provider((window as any).ethereum);
+  const signer = provider.getSigner();
+  // Instancier le contrat ERC721
+  const contract = new ethers.Contract(contractAddress, contractInterface, signer);
+
   return (
     <div className={styles.body}>
       <p>${wallet?.details.account}</p>
       <Router>
         <Navbar />
         <Routes>
-          <Route path="/my-collection" element={ownerAddress ? <MyCollection contractAddress={contractAddress} ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/> {/* Route pour Ma Collection */}
+          <Route path="/" element={<p>Home</p>} />
+          <Route path="/album" element={<Album />} />
+          <Route path="/my-collection" element={ownerAddress ? <MyCollection contract={contract} ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
           <Route path="/booster" element={ownerAddress ? <OpenBooster ownerAddress={ownerAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
         </Routes>
       </Router>

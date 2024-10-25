@@ -21,17 +21,32 @@ export interface CardProps {
 }
 
 // Composant réutilisable pour afficher une carte
-export const Card: React.FC<CardProps> = ({ id, name, types, set, averagePrices, images, owner }) => {
+export const Card: React.FC<CardProps> = (card) => {
     return (
-        <div className="card-container" style={styles.card}>
-            <img src={images.small} alt={name} style={styles.image} />
-            <div>
-                <h3>{name}</h3>
-                <p>Types: {types.join(', ')}</p>
-                <p>Set: {set.name} ({set.series})</p>
-                <p>Prix moyen: {averagePrices} ETH</p>
-                <p>Propriétaire: {owner}</p>
+        <div className="card-container">
+            {/* Affiche le nom de la carte */}
+            <h2>{card.name}</h2>
+
+            {/* Affiche les types */}
+            <p><strong>Types:</strong> {card.types.join(', ')}</p>
+
+            {/* Affiche les informations du set */}
+            <div className="card-set-info">
+                <h4>Set Info</h4>
+                <p><strong>ID:</strong> {card.set.id}</p>
+                <p><strong>Name:</strong> {card.set.name}</p>
+                <p><strong>Series:</strong> {card.set.series}</p>
+                <img src={card.set.images.small} alt={`${card.set.name} Set`} />
             </div>
+
+            {/* Affiche le prix moyen */}
+            <p><strong>Average Price:</strong> ${card.averagePrices}</p>
+
+            {/* Affiche l'image de la carte */}
+            <img src={card.images.small} alt={card.name} />
+
+            {/* Affiche le propriétaire de la carte */}
+            <p><strong>Owner:</strong> {card.owner}</p>
         </div>
     );
 };

@@ -1,24 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ethers } from 'ethers';
-import contractInterface from '../abis/Main.json';
+
 import { CardProps } from './Card';
 
 
 const API_PORT = import.meta.env.API_PORT;
 
-const MyCollection: React.FC<{ contractAddress: string; ownerAddress: string }> = ({ contractAddress, ownerAddress }) => {
+const MyCollection: React.FC<{ contract: ethers.Contract; ownerAddress: string }> = ({ contract, ownerAddress }) => {
   const [cards, setCards] = useState<CardProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Fonction pour récupérer les cartes détenues par le propriétaire
   const fetchOwnerCards = async () => {
     try {
-      // Initialiser le fournisseur et signer avec MetaMask
-      const provider = new ethers.providers.Web3Provider((window as any).ethereum);
-      const signer = provider.getSigner();
-      // Instancier le contrat ERC721
-      const contract = new ethers.Contract(contractAddress, contractInterface, signer);
       // Récupérer le nombre de cartes détenues par le propriétaire
       const balance = await contract.balanceOf(ownerAddress);
       const cardPromises = [];
@@ -27,8 +22,8 @@ const MyCollection: React.FC<{ contractAddress: string; ownerAddress: string }> 
         // Récupérer l'ID du token détenu à un index spécifique
         const tokenId = await contract.tokenOfOwnerByIndex(ownerAddress, i);
         try {
-          const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/token=${tokenId}`);
-          const card: CardProps = response.data; // Les données du backend
+          const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/${tokenId}`);
+          const card: CardProps = response.data;
           cardPromises.push(card);
         }
         catch (error) {
@@ -48,10 +43,10 @@ const MyCollection: React.FC<{ contractAddress: string; ownerAddress: string }> 
 
   // Charger les cartes à partir de la blockchain
   useEffect(() => {
-    if (contractAddress && ownerAddress) {
+    if (ownerAddress) {
       fetchOwnerCards();
     }
-  }, [contractAddress, ownerAddress]);
+  }, [ownerAddress]);
 
   // Affichage des cartes
   if (loading) {

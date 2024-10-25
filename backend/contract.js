@@ -3,7 +3,7 @@ import contracts from '../frontend/src/contracts.json' assert { type: 'json' };
 
 const adminAdress = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 
-export const init = async () => {
+export const MainContract = async () => {
     const blockchainURL = 'http://localhost:8545';
 
     const provider = new ethers.providers.JsonRpcProvider(blockchainURL);
@@ -16,5 +16,3 @@ export const init = async () => {
     const contract_ = signer ? contract.connect(signer) : contract
     return contract_
 };
-
-init()
