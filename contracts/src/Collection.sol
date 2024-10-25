@@ -18,7 +18,6 @@ contract Collection is ERC721Enumerable, Ownable {
   Card[] public cards;
   bool public isBooster;
   uint256[] public cardAdress;
-  mapping(uint256 => Card) cardToOwner;
 
   constructor(string memory _name) ERC721(_name, "PKMN") Ownable(msg.sender) {
     collectionName = _name;
@@ -29,18 +28,17 @@ contract Collection is ERC721Enumerable, Ownable {
     string memory _name,
     string memory _id,
     string memory _imgURL
-  ) external onlyOwner {
+  ) external {
     Card memory carte = Card(_name, _id, address(0), _imgURL);
     uint256 id = cards.length; // Récupérer l'index du nouvel élément
     cards.push(carte); // Ajouter la carte dans le tableau
-    cardToOwner[id] = carte; // Associer la carte à son id dans le mapping
     cardAdress.push(id); // Ajouter l'id de la carte dans le tableau des adresses de cartes
   }
 
   function mintCard(address _to, uint256 _cardNumber) external {
     require(_cardNumber < cards.length, "Invalid card number");
     _safeMint(_to, _cardNumber);
-    cardToOwner[_cardNumber].owner = _to;
+    cards[_cardNumber].owner = _to;
     emit MintCard(_to, _cardNumber);
   }
 
@@ -48,7 +46,7 @@ contract Collection is ERC721Enumerable, Ownable {
     return cards;
   }
 
-  function openBooster(address _buyer) public {
+  function openBooster(address _buyer) public onlyOwner {
     require(isBooster == true);
     for (uint256 i = 0; i < cardAdress.length; i++) {
       this.mintCard(_buyer, cardAdress[i]);

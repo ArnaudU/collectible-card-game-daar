@@ -3,7 +3,6 @@ import { extractData } from "./api.js";
 
 async function addBoosterToCollection() {
     const contract = await MainContract();
-    let boosteNumber = Math.random();
     let arr = await extractData();
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -12,7 +11,6 @@ async function addBoosterToCollection() {
     let cardByBooster = 5
     for (let i = 0; i < 1; i++) {
 
-        let boosterName = "Booster" + boosteNumber
         let cards = []
         for (let j = 0; j < 5; j++) {
             const card = arr[i * cardByBooster + j];
@@ -23,7 +21,7 @@ async function addBoosterToCollection() {
             })
         }
         console.log("Ajout")
-        contract.createBoosters(boosterName, cards);
+        contract.createBoosters(cards[0].id, cards);
     }
 
 }

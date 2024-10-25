@@ -50,7 +50,9 @@ contract Main is Ownable {
     }
   }
 
-  function listCards(address _owner) public view returns (CardData[] memory) {
+  function listCards(
+    address _ownerCard
+  ) public view returns (CardData[] memory) {
     CardData[] memory data = new CardData[](count);
     uint256 index = 0;
     for (uint256 i = 0; i < boosterNames.length; i++) {
@@ -59,12 +61,10 @@ contract Main is Ownable {
       if (address(boosters[collectionName]) != address(0)) {
         Collection.Card[] memory cards = boosters[collectionName].getCards();
         for (uint256 j = 0; j < cards.length; j++) {
-          if (
-            (_owner == address(0) && !(_owner == cards[j].owner)) ||
-            (!(_owner == address(0)) && _owner == cards[j].owner)
-          ) {
+          Collection.Card memory dataCard = cards[j];
+          if (dataCard.owner == _ownerCard || _ownerCard == address(0)) {
             data[index++] = (
-              CardData(cards[j].cardName, cards[j].id, cards[j].imgURL)
+              CardData(dataCard.cardName, dataCard.id, dataCard.imgURL)
             );
           }
         }
