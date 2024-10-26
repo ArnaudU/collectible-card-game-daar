@@ -12,6 +12,7 @@ contract Main is Ownable {
   }
 
   event CollectionCreated(string collectionName, address collectionAddress);
+
   mapping(string => Collection) private boosters;
   Collection private opened;
   string[] internal boosterNames;
@@ -71,19 +72,5 @@ contract Main is Ownable {
       }
     }
     return data;
-  }
-
-  function mintCardsToUser(
-    string memory _collectionName,
-    address _to,
-    uint256[] memory cardIds
-  ) public onlyOwner {
-    require(
-      address(boosters[_collectionName]) != address(0),
-      "Collection does not exist"
-    );
-    for (uint256 i = 0; i < cardIds.length; i++) {
-      boosters[_collectionName].mintCard(_to, cardIds[i]);
-    }
   }
 }
