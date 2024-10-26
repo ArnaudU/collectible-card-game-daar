@@ -45,7 +45,10 @@ contract Collection is ERC721Enumerable {
   function openBooster(address _buyer) public {
     require(isBooster, "Not a booster anymore");
     for (uint256 i = 0; i < cardAdress.length; i++) {
-      this.mintCard(_buyer, cardAdress[i]);
+      this.mintCard(
+        _buyer,
+        uint(keccak256(abi.encodePacked(collectionName))) + cardAdress[i]
+      );
     }
     isBooster = false;
   }
