@@ -18,15 +18,20 @@ const Album: React.FC<{contract: main.Main | undefined; isSuperAdmin: boolean; u
   // Fonction pour récupérer les cartes détenues par le propriétaire
   const fetchAllCards = async () => {
     try {
-      const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo`);
-      const cards: CardProps[] = response.data;
-      setCards(cards);
-      setLoading(false);
+      const response = await axios.get(`http://localhost:${API_PORT}/api/cards/all`);
+      console.log(response.data);
+      // const cards: CardProps[] = response.data;
+      // setCards(cards);
+      // setLoading(false);
     } catch (error) {
       console.error('Erreur lors de la récupération des cartes :', error);
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log(cards.length);
+  }, [cards]);
 
   // Fonction pour obtenir l'intersection des types entre allTypes et les types de la carte
   const getIntersectionOfTypes = (cardTypes: string[]): string[] => {
@@ -58,28 +63,28 @@ const Album: React.FC<{contract: main.Main | undefined; isSuperAdmin: boolean; u
     setToAddress(e.target.value.toLowerCase());
   };
 
-  const handleMintCards = async () => {
-    if (!contract) {
-      console.error('Contrat non initialisé');
-      return;
-    }
-    console.log(contract);
-    for (let i = 0; i < selectedCards.length; i++) {
-      const card = cards.find(card => card.id === selectedCards[i]);
-      if (card) {
-        const collectionNames = getIntersectionOfTypes(card.types);
-        for (let j = 0; j < collectionNames.length; j++) {
-          const owner = contract.address;
-          console.log('Owner:', owner);
-          await contract.mintCardToUser(collectionNames[i], toAddress, 1);
-        }
-      }
-    }
-  }
+  // const handleMintCards = async () => {
+  //   if (!contract) {
+  //     console.error('Contrat non initialisé');
+  //     return;
+  //   }
+  //   console.log(contract);
+  //   for (let i = 0; i < selectedCards.length; i++) {
+  //     const card = cards.find(card => card.id === selectedCards[i]);
+  //     if (card) {
+  //       const collectionNames = getIntersectionOfTypes(card.types);
+  //       for (let j = 0; j < collectionNames.length; j++) {
+  //         const owner = contract.address;
+  //         console.log('Owner:', owner);
+  //         await contract.mintCardToUser(collectionNames[i], toAddress, 1);
+  //       }
+  //     }
+  //   }
+  // }
 
   // Fonction pour gérer le clic sur le bouton
   const handleButtonClick = async () => {
-    handleMintCards();
+    // handleMintCards();
     console.log('Minted cards to address:', toAddress);
   };
 

@@ -51,9 +51,7 @@ contract Main is Ownable {
     }
   }
 
-  function listCards(
-    address _ownerCard
-  ) public view returns (CardData[] memory) {
+  function listCards(address _owner) public view returns (CardData[] memory) {
     CardData[] memory data = new CardData[](count);
     uint256 index = 0;
     for (uint256 i = 0; i < boosterNames.length; i++) {

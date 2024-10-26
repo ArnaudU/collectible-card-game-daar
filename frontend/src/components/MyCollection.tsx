@@ -23,6 +23,7 @@ const MyCollection: React.FC<{ contract: ethers.Contract; userAddress: string }>
         const tokenId = await contract.tokenOfOwnerByIndex(userAddress, i);
         try {
           const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/${tokenId}`);
+          console.log("pass");
           const card: CardProps = response.data;
           cardPromises.push(card);
         }
