@@ -46,8 +46,10 @@ const useWallet = () => {
 }
 
 
+
 export const App: React.FC = () => {
   const [userAddress, setUserAddress] = useState<string | null>(null);
+  
 
   const wallet = useWallet()
   const provider = wallet?.details.provider;
@@ -78,10 +80,21 @@ export const App: React.FC = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<Album contract={contract} isSuperAdmin={isSuperAdmin} userAddress={userAddress}/>} />
-          {/* <Route path="/my-collection" element={userAddress ? <MyCollection contract={contract} userAddress={userAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/> */}
+          <Route path="/my-collection" element={userAddress ? <MyCollection contract={contract} userAddress={userAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
           <Route path="/booster" element={userAddress ? <OpenBooster userAddress={userAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
         </Routes>
       </Router>
     </div>
   )
 }
+
+// import axios from "axios";
+// import { useEffect } from "react";
+
+// export const App = () => {
+//   useEffect(() => {
+//     axios.get("http://localhost:3000/api/test").then((response) => {
+//       console.log(response.data);
+//     });
+//   }, []);
+// };
