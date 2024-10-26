@@ -5,12 +5,6 @@ import "./Collection.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Main is Ownable {
-  struct CardData {
-    string cardName;
-    string id;
-    string imgURL;
-  }
-
   event CollectionCreated(string collectionName, address collectionAddress);
 
   mapping(string => Collection) private boosters;
@@ -25,7 +19,7 @@ contract Main is Ownable {
 
   function createBoosters(
     string memory _name,
-    CardData[] memory data
+    Collection.Card[] memory data
   ) external onlyOwner {
     Collection newCollection = new Collection(_name);
     boosters[_name] = newCollection;
@@ -33,13 +27,13 @@ contract Main is Ownable {
     // Boucle sur les données de cartes
     for (uint i = 0; i < data.length; i++) {
       // Récupérer chaque élément de CardData
-      CardData memory card = data[i];
-      boosters[_name].addCard(card.cardName, card.id, card.imgURL);
+      Collection.Card memory card = data[i];
+      boosters[_name].addCard(card);
       count++;
     }
   }
 
-  function openBooster(address _buyer) public {
+  function openBooster(address _buyer) public onlyOwner {
     for (uint256 i = 0; i < boosterNames.length; i++) {
       string memory collectionName = boosterNames[i];
       // Vérifie que la collection existe
@@ -51,10 +45,22 @@ contract Main is Ownable {
     }
   }
 
+  function mintCardByAdmin(address _ownerCard, string memory cardId) public {
+    Collection.Card[] memory data = boosters["AdminCollection"].getCards();
+    for (uint256 i = 0; i < data.length; i++) {
+      if (
+        keccak256(abi.encodePacked(data[i].id)) ==
+        keccak256(abi.encodePacked(cardId))
+      ) {
+        boosters["AdminCollection"].mintCard(_ownerCard, i);
+      }
+    }
+  }
+
   function listCards(
     address _ownerCard
-  ) public view returns (CardData[] memory) {
-    CardData[] memory data = new CardData[](count);
+  ) public view returns (Collection.Card[] memory) {
+    Collection.Card[] memory data = new Collection.Card[](count);
     uint256 index = 0;
     for (uint256 i = 0; i < boosterNames.length; i++) {
       string memory collectionName = boosterNames[i];
@@ -64,13 +70,22 @@ contract Main is Ownable {
         for (uint256 j = 0; j < cards.length; j++) {
           Collection.Card memory dataCard = cards[j];
           if (dataCard.owner == _ownerCard || _ownerCard == address(0)) {
-            data[index++] = (
-              CardData(dataCard.cardName, dataCard.id, dataCard.imgURL)
-            );
+            data[index++] = dataCard;
           }
         }
       }
     }
     return data;
+  }
+
+  function countBooster() public view returns (uint256) {
+    uint256 cpt = 0;
+    for (uint256 i = 0; i < boosterNames.length; i++) {
+      string memory collectionName = boosterNames[i];
+      if (boosters[collectionName].checkIfBooster()) {
+        cpt++;
+      }
+    }
+    return cpt;
   }
 }

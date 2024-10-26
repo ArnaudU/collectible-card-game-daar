@@ -4,12 +4,13 @@ pragma solidity ^0.8;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract Collection is ERC721Enumerable, Ownable {
+contract Collection is ERC721Enumerable {
   struct Card {
     string cardName;
     string id;
     address owner;
     string imgURL;
+    string setName;
   }
 
   event MintCard(address indexed to, uint256 indexed cardNumber);
@@ -19,17 +20,12 @@ contract Collection is ERC721Enumerable, Ownable {
   bool public isBooster;
   uint256[] public cardAdress;
 
-  constructor(string memory _name) ERC721(_name, "PKMN") Ownable(msg.sender) {
+  constructor(string memory _name) ERC721(_name, "PKMN") {
     collectionName = _name;
     isBooster = true;
   }
 
-  function addCard(
-    string memory _name,
-    string memory _id,
-    string memory _imgURL
-  ) external {
-    Card memory carte = Card(_name, _id, address(0), _imgURL);
+  function addCard(Card memory carte) external {
     uint256 id = cards.length; // Récupérer l'index du nouvel élément
     cards.push(carte); // Ajouter la carte dans le tableau
     cardAdress.push(id); // Ajouter l'id de la carte dans le tableau des adresses de cartes
@@ -46,8 +42,8 @@ contract Collection is ERC721Enumerable, Ownable {
     return cards;
   }
 
-  function openBooster(address _buyer) public onlyOwner {
-    require(isBooster == true);
+  function openBooster(address _buyer) public {
+    require(isBooster, "Not a booster anymore");
     for (uint256 i = 0; i < cardAdress.length; i++) {
       this.mintCard(_buyer, cardAdress[i]);
     }
