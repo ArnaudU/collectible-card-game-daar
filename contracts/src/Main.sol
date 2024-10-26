@@ -69,8 +69,10 @@ contract Main is Ownable {
         Collection.Card[] memory cards = boosters[collectionName].getCards();
         for (uint256 j = 0; j < cards.length; j++) {
           Collection.Card memory dataCard = cards[j];
-          if (dataCard.owner == _ownerCard || _ownerCard == address(0)) {
-            data[index++] = dataCard;
+          if (dataCard.owner == _owner || _owner == address(0)) {
+            data[index++] = (
+              CardData(dataCard.cardName, dataCard.id, dataCard.imgURL)
+            );
           }
         }
       }
@@ -88,4 +90,19 @@ contract Main is Ownable {
     }
     return cpt;
   }
+  // Fonction pour obtenir le nombre total de cartes possédées par une adresse dans toutes les collections
+    function balanceOf(address ownerAddress) public view returns (uint256) {
+        uint256 totalBalance = 0;
+
+        // Boucle sur chaque collection dans le tableau boosterNames
+        for (uint256 i = 0; i < boosterNames.length; i++) {
+            // Vérifie que la collection existe
+            if (address(boosters[boosterNames[i]]) != address(0)) {
+                // Ajoute le balanceOf de cette collection au total
+                totalBalance += boosters[boosterNames[i]].balanceOf(ownerAddress);
+            }
+        }
+
+        return totalBalance;
+    }
 }

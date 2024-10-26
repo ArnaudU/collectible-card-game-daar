@@ -56,11 +56,4 @@ contract Collection is ERC721Enumerable {
   function checkIfBooster() public view returns (bool) {
     return isBooster;
   }
-
-  function tokenURI(
-    uint256 _tokenId
-  ) public view override returns (string memory) {
-    require(_tokenId < cards.length, "Nonexistent token");
-    return cards[_tokenId].imgURL;
-  }
 }

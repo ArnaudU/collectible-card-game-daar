@@ -74,7 +74,6 @@ cardRouter.get('/getInfo', async (req, res) => {
 cardRouter.get('/all', async (req, res) => {
     try {
         const contract = await MainContract();
-        console.log(ZeroAddress);
         const data = await contract.listCards(ZeroAddress);
         res.json(data);
     }

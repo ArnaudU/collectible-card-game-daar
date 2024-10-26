@@ -49,6 +49,7 @@ const useWallet = () => {
 
 export const App: React.FC = () => {
   const [userAddress, setUserAddress] = useState<string | null>(null);
+  const [redeemed, setRedeemed] = useState<boolean>(false);
   
 
   const wallet = useWallet()
@@ -80,8 +81,8 @@ export const App: React.FC = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<Album contract={contract} isSuperAdmin={isSuperAdmin} userAddress={userAddress}/>} />
-          <Route path="/my-collection" element={userAddress ? <MyCollection contract={contract} userAddress={userAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
-          <Route path="/booster" element={userAddress ? <OpenBooster userAddress={userAddress} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
+          <Route path="/my-collection" element={userAddress ? <MyCollection contract={contract} userAddress={userAddress} redeemed={redeemed} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
+          <Route path="/booster" element={userAddress ? <OpenBooster userAddress={userAddress} redeemed={redeemed} setRedeemed={setRedeemed} /> : <p>Aucune adresse propriétaire trouvée</p>}/>
         </Routes>
       </Router>
     </div>

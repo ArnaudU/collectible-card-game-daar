@@ -7,23 +7,30 @@ import { CardProps } from './Card';
 
 const API_PORT = import.meta.env.API_PORT;
 
-const MyCollection: React.FC<{ contract: ethers.Contract; userAddress: string }> = ({ contract, userAddress }) => {
+interface MyCollectionProps {
+  contract: ethers.Contract; 
+  userAddress: string;
+  redeemed: boolean;
+}
+
+const MyCollection: React.FC<MyCollectionProps> = ({ contract, userAddress, redeemed }) => {
   const [cards, setCards] = useState<CardProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Fonction pour récupérer les cartes détenues par le propriétaire
   const fetchOwnerCards = async () => {
     try {
+      console.log(contract);
       // Récupérer le nombre de cartes détenues par le propriétaire
       const balance = await contract.balanceOf(userAddress);
+      console.log('Nombre de cartes détenu par le propriétaire :', balance.toNumber());
       const cardPromises = [];
       // Boucle pour récupérer chaque token détenu par le propriétaire
       for (let i = 0; i < balance.toNumber(); i++) {
-        // Récupérer l'ID du token détenu à un index spécifique
+        // Récupérer l'ID du token détenu à un index spécifique)
         const tokenId = await contract.tokenOfOwnerByIndex(userAddress, i);
         try {
           const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/${tokenId}`);
-          console.log("pass");
           const card: CardProps = response.data;
           cardPromises.push(card);
         }
@@ -35,6 +42,7 @@ const MyCollection: React.FC<{ contract: ethers.Contract; userAddress: string }>
       // Mettre à jour l'état avec la liste des cartes
       const cardList = await Promise.all(cardPromises);
       setCards(cardList);
+      console.log('Cartes récupérées :', cardList);
       setLoading(false);
     } catch (error) {
       console.error('Erreur lors de la récupération des cartes :', error);
@@ -44,10 +52,10 @@ const MyCollection: React.FC<{ contract: ethers.Contract; userAddress: string }>
 
   // Charger les cartes à partir de la blockchain
   useEffect(() => {
-    if (userAddress) {
+    if (redeemed) {
       fetchOwnerCards();
     }
-  }, [userAddress]);
+  }, [redeemed]);
 
   // Affichage des cartes
   if (loading) {

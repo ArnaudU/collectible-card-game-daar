@@ -4,6 +4,7 @@ import { MainContract } from "../contract.js";
 
 boostersRouter.post('/open/:address', async (req, res) => {
     const user = req.params.address;
+    console.log(user);
     try {
         const contract = await MainContract();
         const data = await contract.openBooster(user);
