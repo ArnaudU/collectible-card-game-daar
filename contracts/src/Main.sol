@@ -88,9 +88,9 @@ contract Main is Ownable {
     return cards;
   }
 
-  function getMinted() public view returns (Collection.Card[] memory) {
-    require(address(boosters["AdminCollection"]) != address(0), "Booster admin non init");
-    Collection.Card[] memory minted = boosters["AdminCollection"].getMinted();
+  function getMinted(string memory _name) public view returns (Collection.Card[] memory) {
+    require(address(boosters[_name]) != address(0), "Booster admin non init");
+    Collection.Card[] memory minted = boosters[_name].getMinted();
     return minted;
   }
 

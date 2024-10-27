@@ -4,8 +4,7 @@ import { ethers } from 'ethers';
 
 import { CardProps, Card, processCards } from './Card';
 
-
-const API_PORT = import.meta.env.VITE_API_PORT;
+const collectionNames = ['AdminCollection', 'Bpn1', 'Bpn2'];
 
 interface MyCollectionProps {
   contract: ethers.Contract; 
@@ -22,29 +21,23 @@ const MyCollection: React.FC<MyCollectionProps> = ({ contract, userAddress, rede
     try {
       console.log(contract);
       // Récupérer le nombre de cartes détenues par le propriétaire
-      const minted = await contract.getMinted();
-      const size = minted.length;
-      console.log('Nombre de cartes détenu par le propriétaire :', size);
-      const cardPromises = [];
-      // Boucle pour récupérer chaque token détenu par le propriétaire
-      let i;
-      for (i = 0; i < size; i++) {
-        // Récupérer l'ID du token détenu à un index spécifique)  
-        if (minted[i].owner.toLowerCase() !== userAddress.toLowerCase()) {
-          continue;
+      let cardList: CardProps[] = [];
+      for (const collectionName of collectionNames) {
+        const minted = await contract.getMinted(collectionName);
+        const size = minted.length;
+        const cardPromises = [];
+        // Boucle pour récupérer chaque token détenu par le propriétaire
+        for (let i = 0; i < size; i++) {
+          // Récupérer l'ID du token détenu à un index spécifique)  
+          if (minted[i].owner.toLowerCase() === userAddress.toLowerCase()) {
+            cardPromises.push(minted[i]);
+          }
         }
-        try {
-          const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/${i}`);
-          const data = response.data;
-          cardPromises.push(data);
-        }
-        catch (error) {
-          console.error('Erreur lors de la récupération des informations de la carte :', error);
-        }
+        const process = processCards(cardPromises);
+        cardList = cardList.concat(process);
       }
 
       // Mettre à jour l'état avec la liste des cartes
-      const cardList = processCards(cardPromises);
       setCards(cardList);
       setLoading(false);
     } catch (error) {
