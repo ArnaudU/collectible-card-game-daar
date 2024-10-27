@@ -18,7 +18,7 @@ const Album: React.FC<{contract: main.Main | undefined; isSuperAdmin: boolean; u
     try {
       const response = await axios.get(`http://localhost:${API_PORT}/api/cards/all`);
       const cards: CardProps[] = processCards(response.data);
-      setCards(cards);
+      setCards(cards.slice(10, cards.length));
       setLoading(false);
     } catch (error) {
       console.error('Erreur lors de la récupération des cartes :', error);
@@ -89,7 +89,9 @@ const Album: React.FC<{contract: main.Main | undefined; isSuperAdmin: boolean; u
 
       {/* Input et bouton */}
       {isSuperAdmin && (
+        
       <div style={{ marginBottom: '20px' }}>
+        <h1>{"Selected cards :" + selectedCards.length}</h1>
         <input
           type="text"
           value={toAddress}
@@ -103,7 +105,6 @@ const Album: React.FC<{contract: main.Main | undefined; isSuperAdmin: boolean; u
       </div>)}
 
       {/* Rendu des cartes */}
-      <h1>{"list length :" + selectedCards.length}</h1>
       {cards.length > 0 ? (
         <ul style={{ listStyleType: 'none', padding: 0 }}>
           {cards.map((card) => (
