@@ -52,7 +52,7 @@ contract Collection is ERC721 {
     for (uint256 i = 0; i < cardAdress.length; i++) {
       this.mintCard(
         _buyer,
-        uint(keccak256(abi.encodePacked(collectionName))) + cardAdress[i]
+        minted.length
       );
     }
     isBooster = false;

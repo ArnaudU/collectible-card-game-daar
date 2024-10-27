@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { ethers } from 'ethers';
 
 const API_PORT = import.meta.env.VITE_API_PORT;
 
 interface OpenBoosterProps {
+  contract: ethers.Contract;
   userAddress: string;
   redeemed: boolean;
   setRedeemed: (redeemed: boolean) => void;
 }
 
-const OpenBooster: React.FC<OpenBoosterProps> = ({ userAddress, redeemed, setRedeemed }) => {
+const OpenBooster: React.FC<OpenBoosterProps> = ({ contract, userAddress, redeemed, setRedeemed }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +37,10 @@ const OpenBooster: React.FC<OpenBoosterProps> = ({ userAddress, redeemed, setRed
 
     try {
       await axios.post(`http://localhost:${API_PORT}/api/booster/open/${userAddress}`);
+      const minted = await contract.getMinted();
+      const size = minted.length;
+      console.log('userAddress:', userAddress);
+      console.log('Nombre de cartes détenu par le propriétaire :', size);
       setRedeemed(true);
     } catch (err) {
       setError('Erreur lors de l\'ouverture du booster');

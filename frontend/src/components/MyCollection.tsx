@@ -24,7 +24,7 @@ const MyCollection: React.FC<MyCollectionProps> = ({ contract, userAddress, rede
       // Récupérer le nombre de cartes détenues par le propriétaire
       const minted = await contract.getMinted();
       const size = minted.length;
-      // console.log('Nombre de cartes détenu par le propriétaire :', balance.toNumber());
+      console.log('Nombre de cartes détenu par le propriétaire :', size);
       const cardPromises = [];
       // Boucle pour récupérer chaque token détenu par le propriétaire
       let i;

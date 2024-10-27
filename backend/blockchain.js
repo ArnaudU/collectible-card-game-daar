@@ -30,6 +30,7 @@ export async function BoosterToBlockchain() {
                 })
             }
             await contract.createBoosters(setName, cards);
+            console.log(cards);
             console.log("Nombre de booster ajouté dans la blockchain : " + boosterNumber + " / " + (numberOfBooster + 1));
             boosterNumber++;
         }
@@ -46,6 +47,7 @@ export async function BoosterToBlockchain() {
             })
         }
         await contract.createBoosters(setName, cards);
+        console.log(cards);
         console.log("Nombre de booster ajouté dans la blockchain : " + (numberOfBooster + 1) + " / " + (numberOfBooster + 1));
         boosterNumber++;
     }
