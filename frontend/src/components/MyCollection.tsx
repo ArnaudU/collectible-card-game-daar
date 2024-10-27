@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ethers } from 'ethers';
 
-import { CardProps } from './Card';
+import { CardProps, Card, processCards } from './Card';
 
 
-const API_PORT = import.meta.env.API_PORT;
+const API_PORT = import.meta.env.VITE_API_PORT;
 
 interface MyCollectionProps {
   contract: ethers.Contract; 
@@ -22,17 +22,21 @@ const MyCollection: React.FC<MyCollectionProps> = ({ contract, userAddress, rede
     try {
       console.log(contract);
       // Récupérer le nombre de cartes détenues par le propriétaire
-      const balance = await contract.balanceOf(userAddress);
-      console.log('Nombre de cartes détenu par le propriétaire :', balance.toNumber());
+      const minted = await contract.getMinted();
+      const size = minted.length;
+      // console.log('Nombre de cartes détenu par le propriétaire :', balance.toNumber());
       const cardPromises = [];
       // Boucle pour récupérer chaque token détenu par le propriétaire
-      for (let i = 0; i < balance.toNumber(); i++) {
-        // Récupérer l'ID du token détenu à un index spécifique)
-        const tokenId = await contract.tokenOfOwnerByIndex(userAddress, i);
+      let i;
+      for (i = 0; i < size; i++) {
+        // Récupérer l'ID du token détenu à un index spécifique)  
+        if (minted[i].owner.toLowerCase() !== userAddress.toLowerCase()) {
+          continue;
+        }
         try {
-          const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/${tokenId}`);
-          const card: CardProps = response.data;
-          cardPromises.push(card);
+          const response = await axios.get(`http://localhost:${API_PORT}/api/cards/getInfo/${i}`);
+          const data = response.data;
+          cardPromises.push(data);
         }
         catch (error) {
           console.error('Erreur lors de la récupération des informations de la carte :', error);
@@ -40,9 +44,8 @@ const MyCollection: React.FC<MyCollectionProps> = ({ contract, userAddress, rede
       }
 
       // Mettre à jour l'état avec la liste des cartes
-      const cardList = await Promise.all(cardPromises);
+      const cardList = processCards(cardPromises);
       setCards(cardList);
-      console.log('Cartes récupérées :', cardList);
       setLoading(false);
     } catch (error) {
       console.error('Erreur lors de la récupération des cartes :', error);
@@ -51,11 +54,15 @@ const MyCollection: React.FC<MyCollectionProps> = ({ contract, userAddress, rede
   };
 
   // Charger les cartes à partir de la blockchain
+  // useEffect(() => {
+  //   if (redeemed) {
+  //     fetchOwnerCards();
+  //   }
+  // }, [redeemed]);
+
   useEffect(() => {
-    if (redeemed) {
-      fetchOwnerCards();
-    }
-  }, [redeemed]);
+    fetchOwnerCards();
+  }, []);
 
   // Affichage des cartes
   if (loading) {
@@ -66,9 +73,11 @@ const MyCollection: React.FC<MyCollectionProps> = ({ contract, userAddress, rede
     <div>
       <h1>Ma Collection</h1>
       {cards.length > 0 ? (
-        <ul>
-          {cards.map((card) => (
-            <li key={card.id}>Carte ID: {card.id}</li>
+        <ul style={{ listStyleType: 'none', padding: 0 }}>
+          {Array.from({ length: cards.length }, (_, index) => (
+            <li key={index}>
+              <Card card={cards[index]} />
+            </li>
           ))}
         </ul>
       ) : (

@@ -10,7 +10,7 @@ const API_PORT = import.meta.env.VITE_API_PORT;
 const Album: React.FC<{contract: main.Main | undefined; isSuperAdmin: boolean; userAddress: string | null}> = ({ contract, isSuperAdmin, userAddress}) => {
   const [cards, setCards] = useState<CardProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedCards, setSelectedCards] = useState<string[]>([]);
+  const [selectedCards, setSelectedCards] = useState<number[]>([]);
   const [toAddress, setToAddress] = useState(''); // Gérer l'état de l'input
   
   // Fonction pour récupérer les cartes détenues par le propriétaire
@@ -27,18 +27,21 @@ const Album: React.FC<{contract: main.Main | undefined; isSuperAdmin: boolean; u
   };
 
   useEffect(() => {
-    console.log("nombre cartes :", cards.length);
+    console.log(cards);
   }, [cards]);
 
 
   // Fonction pour gérer l'ajout ou la suppression d'une carte par ID
-  const handleCardClick = (cardId: string) => {
-    if (selectedCards.includes(cardId)) {
-        // Si la carte est déjà sélectionnée, on la retire de la liste
-        setSelectedCards(selectedCards.filter(id => id !== cardId));
+  const handleCardClick = (card: CardProps) => {
+    const cardIndex = cards.indexOf(card);
+    console.log('Card index:', cardIndex);
+    
+    if (selectedCards.includes(cardIndex)) {
+        // Si la carte est déjà sélectionnée, on la retire de la liste par son index dans `cards`
+        setSelectedCards(selectedCards.filter(index => index !== cardIndex));
     } else {
         // Sinon, on l'ajoute à la liste des cartes sélectionnées
-        setSelectedCards([...selectedCards, cardId]);
+        setSelectedCards([...selectedCards, cardIndex]);
     }
   };
 
@@ -47,8 +50,23 @@ const Album: React.FC<{contract: main.Main | undefined; isSuperAdmin: boolean; u
   };
 
   const handleMintCards = async () => {
-    console.log('Minted cards to address:', toAddress);
-  }
+    console.log('Minting cards:', selectedCards);
+    for (const cardNumber of selectedCards) {
+        try {
+            console.log(toAddress, cardNumber);
+            const response = await axios.get(`http://localhost:${API_PORT}/api/cards/mint`, {
+                params: {
+                    address: toAddress,
+                    card: cardNumber
+                }
+            });
+            console.log('Minting successful:', response);
+        } catch (error) {
+            console.error('Error minting card:', error);
+        }
+    }
+  };
+
 
 
   // Charger les cartes à partir de la blockchain
@@ -91,12 +109,12 @@ const Album: React.FC<{contract: main.Main | undefined; isSuperAdmin: boolean; u
           {cards.map((card) => (
             <li 
             key={card.id} 
-            onClick={() => isSuperAdmin ? handleCardClick(card.id) : null} // Ajouter ou supprimer la carte si l'utilisateur est super-admin
+            onClick={() => isSuperAdmin ? handleCardClick(card) : null} // Ajouter ou supprimer la carte si l'utilisateur est super-admin
             style={{ 
               cursor: 'pointer',
               padding: '10px', 
               border: isSuperAdmin 
-                  ? (selectedCards.includes(card.id) ? '2px solid blue' : '1px solid #ccc') 
+                  ? (selectedCards.includes(cards.indexOf(card)) ? '2px solid blue' : '1px solid #ccc') 
                   : 'none', // Aucune bordure si l'utilisateur n'est pas super-admin
               marginBottom: '5px'
             }}>

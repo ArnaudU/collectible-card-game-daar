@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.use('/api/cards', cardRouter);
 app.use('/api/booster', boostersRouter);
-  
+
 
 app.listen(port, () => {
     console.log(`Serveur connecté au ${port}`);

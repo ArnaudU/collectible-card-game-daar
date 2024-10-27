@@ -14,8 +14,8 @@ export const processCards = (cards: string[][]): CardProps[] => {
         const cardData: CardProps = {
             id: cards[i][1],
             name: cards[i][0],
-            images: cards[i][2],
-            owner: ""
+            images: cards[i][3],
+            owner: cards[i][2],
         };
         cardList.push(cardData);
     }
